@@ -1,0 +1,18 @@
+﻿<?xml version="1.0"?>
+<doc>
+  <assembly>
+    <name>Sample.Core</name>
+  </assembly>
+  <members>
+    <member name="P:Sample.Core.User.Foo">
+      <summary>
+        The best foo in all the land
+      </summary>
+    </member>
+    <member name="P:Sample.Core.User.Bar">
+      <summary>
+        The place where you grab a pint
+      </summary>
+    </member>
+  </members>
+</doc>
