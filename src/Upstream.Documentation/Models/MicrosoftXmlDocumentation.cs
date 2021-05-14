@@ -20,6 +20,9 @@ namespace Upstream.Documentation.Models
 
             [XmlElement("summary")]
             public string Summary { get; set; }
+
+            [XmlElement("remarks")]
+            public string Remarks { get; set; }
         }
     }
 }

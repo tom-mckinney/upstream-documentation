@@ -15,13 +15,6 @@ namespace Upstream.Documentation
 
     public class XmlDocumentationParser : IXmlDocumentationParser
     {
-        private readonly IFileSystem _fileSystem;
-
-        public XmlDocumentationParser(IFileSystem fileSystem)
-        {
-            _fileSystem = fileSystem;
-        }
-
         public ValueTask<IEnumerable<DocumentationGroup>> GetDocumentationGroupsAsync(FileInfo file, IEnumerable<GroupSelector> selectors)
         {
             var serializer = new XmlSerializer(typeof(MicrosoftXmlDocumentation));
@@ -34,12 +27,13 @@ namespace Upstream.Documentation
             {
                 foreach (var selector in selectors)
                 {
-                    if (selector.Match.IsMatch(member.Name))
+                    if (TryGetMemberName(member.Name, selector, out string memberName))
                     {
                         output.Add(new DocumentationGroup
                         {
-                            Name = member.Name,
+                            Name = memberName,
                             Summary = CleanElementString(member.Summary),
+                            Remarks = CleanElementString(member.Remarks),
                         });
                     }
                 }
@@ -48,8 +42,36 @@ namespace Upstream.Documentation
             return new ValueTask<IEnumerable<DocumentationGroup>>(output);
         }
 
+        public bool TryGetMemberName(string name, GroupSelector selector, out string memberName)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentNullException(nameof(name));
+            if (selector == null)
+                throw new ArgumentNullException(nameof(selector));
+
+            var typeName = selector.Type?.FullName ?? 
+                selector.TypeName ?? 
+                throw new ArgumentException("Selector must include a Type or TypeName");
+            var typeNameIndex = name.IndexOf(typeName);
+
+            if (typeNameIndex < 0)
+            {
+                memberName = null;
+                return false;
+            }
+
+            memberName = name
+                .Substring(typeNameIndex + typeName.Length)
+                .TrimStart('.');
+
+            return true;
+        }
+
         public string CleanElementString(string input)
         {
+            if (string.IsNullOrWhiteSpace(input))
+                return null;
+
             return input
                 .TrimStart('\n')
                 .TrimStart()

@@ -9,8 +9,6 @@ namespace Upstream.Documentation
     public interface IFileSystem
     {
         IEnumerable<FileInfo> GetDocumentationFiles(IEnumerable<string> assemblyNames, string rootDirectoryPath);
-
-        Stream ReadFile(FileInfo file);
     }
 
     public class FileSystem : IFileSystem
@@ -20,11 +18,6 @@ namespace Upstream.Documentation
             var rootDirectory = new DirectoryInfo(rootDirectoryPath);
 
             return assemblyNames.SelectMany(n => rootDirectory.GetFiles($"{n}.xml", SearchOption.AllDirectories));
-        }
-
-        public Stream ReadFile(FileInfo file)
-        {
-            throw new NotImplementedException();
         }
     }
 }

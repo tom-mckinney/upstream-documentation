@@ -13,6 +13,9 @@
       <summary>
         The place where you grab a pint
       </summary>
+      <remarks>
+        $1 beers on Tuesday
+      </remarks>
     </member>
   </members>
 </doc>

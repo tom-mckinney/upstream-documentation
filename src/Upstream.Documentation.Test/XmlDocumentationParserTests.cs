@@ -1,12 +1,7 @@
-﻿using Moq;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Xml.Serialization;
 using Upstream.Documentation.Models;
 using Upstream.Testing;
 using Xunit;
@@ -15,16 +10,9 @@ namespace Upstream.Documentation.Test
 {
     public class XmlDocumentationParserTests : TestBase<IXmlDocumentationParser>
     {
-        Mock<IFileSystem> _fileSystemMock;
-
-        public XmlDocumentationParserTests()
-        {
-            _fileSystemMock = MockRepository.Create<IFileSystem>();
-        }
-
         protected override IXmlDocumentationParser CreateTestClass()
         {
-            return new XmlDocumentationParser(_fileSystemMock.Object);
+            return new XmlDocumentationParser();
         }
 
         [Theory]
@@ -42,10 +30,18 @@ namespace Upstream.Documentation.Test
             var foo = output.ElementAt(0);
             Assert.Equal("Foo", foo.Name);
             Assert.Equal("The best foo in all the land", foo.Summary);
+            Assert.Null(foo.Remarks);
 
             var bar = output.ElementAt(1);
             Assert.Equal("Bar", bar.Name);
             Assert.Equal("The place where you grab a pint", bar.Summary);
+            Assert.Equal("$1 beers on Tuesday", bar.Remarks);
+        }
+
+        [Fact]
+        public void TryGetMemberName_success()
+        {
+
         }
 
         public static IEnumerable<object[]> GetDocumentationSelectors => new List<object[]>
@@ -57,17 +53,31 @@ namespace Upstream.Documentation.Test
                     new GroupSelector
                     {
                         Name = "User",
-                        Match = new Regex("User")
+                        Type = typeof(Sample.Core.User),
                     }
                 },
-                //new[]
-                //{
-                //    new GroupSelector
-                //    {
-                //        Name = "User",
-                //        Type = typeof(User)
-                //    }
-                //},
+            },
+            new object[]
+            {
+                new[]
+                {
+                    new GroupSelector
+                    {
+                        Name = "User",
+                        TypeName = "Sample.Core.User",
+                    }
+                },
+            },
+            new object[]
+            {
+                new[]
+                {
+                    new GroupSelector
+                    {
+                        Name = "User",
+                        TypeName = "User",
+                    }
+                },
             }
         };
     }
